@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
@@ -60,10 +61,4 @@ Route::get('/', function () {
 });
 
 
-Route::post('/', function (Request $request) {
-    $file = $request->file('file');
-    $file->store('/tests', 'public');
-    // return $file->getContent();
-    return Hash::make($file->getContent());
-
-});
+Route::post('/', [FileController::class, 'store']);
