@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('uploaded_file_path');
             $table->string('file_uploaded_by');
             $table->string('file_stored_by');
+            $table->string('file_hash');
             $table->foreignIdFor(Block::class)->constrained();
             $table->timestamps();
         });
