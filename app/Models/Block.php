@@ -10,6 +10,8 @@ class Block extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function Transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Hash;
 
 class Transaction extends Model
 {
@@ -20,11 +21,14 @@ class Transaction extends Model
 
     public static function createTransaction($params)
     {
+
         $noOfTransactionsInPreviousBlock =
             Block::latest()
                 ->first()
                     ?->transactions()
                 ->count();
+
+
 
         if ($noOfTransactionsInPreviousBlock && $noOfTransactionsInPreviousBlock < 2) {
             return Block::latest()
@@ -32,7 +36,15 @@ class Transaction extends Model
                 ->transactions()
                 ->create($params);
         } else {
-            return Block::create()
+            $block = Block::with('transactions')->latest()->first();
+
+
+            $previousBlockHash = $block ? Hash::make(json_encode($block->toJson())) : '';
+
+
+            return Block::create([
+                'previous_block_hash' => $previousBlockHash
+            ])
                 ->transactions()
                 ->create($params);
         }
