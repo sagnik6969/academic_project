@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use ParagonIE\Halite\Asymmetric\Crypto;
+use ParagonIE\Halite\KeyFactory;
 
 class Transaction extends Model
 {
@@ -21,6 +24,20 @@ class Transaction extends Model
 
     public static function createTransaction($params)
     {
+        $privateKey = KeyFactory::loadSignatureSecretKey(base_path() . '/.block_chain_keys/private');
+        $publicKey = KeyFactory::loadSignaturePublicKey(base_path() . '/.block_chain_keys/public');
+        $signature = Crypto::sign(json_encode($params), $privateKey);
+
+        // if (Crypto::verify(json_encode($params), $publicKey, $signature)) {
+        //     Log::info('Signature verified successfully');
+        // } else {
+        //     Log::info(json_encode($params));
+        //     Log::info($publicKey->getRawKeyMaterial());
+        //     Log::info($signature);
+        //     Log::info('unable to verify signature');
+        // }
+        // $params['digital_signature'] = $signature;
+
 
         $noOfTransactionsInPreviousBlock =
             Block::latest()

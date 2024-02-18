@@ -31,8 +31,8 @@ class GenerateEncryptionKeys extends Command
         $sign_secret = $sign_keyPair->getSecretKey();
         $sign_public = $sign_keyPair->getPublicKey();
 
-        KeyFactory::save($sign_secret, './.block_chain_keys/private');
-        KeyFactory::save($sign_public, './.block_chain_keys/public');
+        KeyFactory::save($sign_secret, base_path() . '/.block_chain_keys/private');
+        KeyFactory::save($sign_public, base_path() . '/.block_chain_keys/public');
 
         $this->info('blockchain keys generated successfully!!');
 
