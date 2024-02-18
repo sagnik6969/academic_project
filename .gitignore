@@ -5,6 +5,7 @@
 /public/storage
 /storage/*.key
 /vendor
+/.block_chain_keys
 .env
 .env.backup
 .env.production

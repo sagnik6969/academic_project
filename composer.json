@@ -10,7 +10,7 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
-        "spatie/crypto": "^2.0"
+        "paragonie/halite": "^5.1"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.15",
