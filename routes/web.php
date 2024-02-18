@@ -61,4 +61,4 @@ Route::get('/', function () {
 });
 
 
-Route::post('/', [FileController::class, 'store']);
+// Route::post('/', [FileController::class, 'store']);

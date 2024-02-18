@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -9,10 +10,32 @@ class FileController extends Controller
 {
     public function store(Request $request)
     {
+        $request->validate([
+            'file' => 'required|file'
+        ]);
+
         $file = $request->file('file');
-        $file->store('/tests', 'public');
+        $path = $file->store('/tests', 'public');
         // return $file->getContent();
-        return Hash::make($file->getContent());
+        $fileContent = $file->getContent();
+        $fileHash = Hash::make($fileContent);
+
+        $transaction = Transaction::createTransaction([
+            'uploaded_file_path' => url('storage/' . $path),
+            'file_uploaded_by' => 'sagnik',
+            'file_stored_by' => env('APP_PUBLIC_KEY'),
+            'file_hash' => $fileHash,
+
+        ]);
+        // return redirect(url('storage/' . $path));
+        return response()->json(
+            [
+                'file_hash' => $fileHash,
+                'path' => url('storage/' . $path),
+                'transaction' => $transaction
+            ]
+
+        );
 
     }
 }
