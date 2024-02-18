@@ -27,15 +27,9 @@ class FileController extends Controller
             'file_hash' => $fileHash,
 
         ]);
+        $transaction->load('block');
         // return redirect(url('storage/' . $path));
-        return response()->json(
-            [
-                'file_hash' => $fileHash,
-                'path' => url('storage/' . $path),
-                'transaction' => $transaction
-            ]
-
-        );
+        return $transaction;
 
     }
 }
