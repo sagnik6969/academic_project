@@ -23,7 +23,7 @@ class FileController extends Controller
         $transaction = Transaction::createTransaction([
             'uploaded_file_path' => url('storage/' . $path),
             'file_uploaded_by' => 'sagnik',
-            'file_stored_by' => env('APP_PUBLIC_KEY'),
+            'file_stored_by' => env('BLOCK_CHAIN_PUBLIC_KEY'),
             'file_hash' => $fileHash,
 
         ]);

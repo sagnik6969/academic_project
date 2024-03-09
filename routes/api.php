@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BlockChainController;
 use App\Http\Controllers\FileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -20,3 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::apiResource('file', FileController::class)->only(['store']);
+Route::get('full_blockchain', [BlockChainController::class, 'getFullBlockChain']);
+Route::post('verify_transaction', [BlockChainController::class, 'verifyTransaction']);

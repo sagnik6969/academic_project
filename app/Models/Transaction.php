@@ -28,6 +28,7 @@ class Transaction extends Model
         $publicKey = KeyFactory::loadSignaturePublicKey(base_path() . '/.block_chain_keys/public');
         $signature = Crypto::sign(json_encode($params), $privateKey);
 
+        //KeyFactory::importSignaturePublicKey() => to derive the key from string
         // if (Crypto::verify(json_encode($params), $publicKey, $signature)) {
         //     Log::info('Signature verified successfully');
         // } else {
@@ -51,7 +52,11 @@ class Transaction extends Model
             return Block::latest()
                 ->first()
                 ->transactions()
-                ->create($params);
+                ->create([
+                    ...$params,
+                    'digital_signature' => $signature
+
+                ]);
         } else {
             $block = Block::with('transactions')->latest()->first();
 
@@ -63,8 +68,36 @@ class Transaction extends Model
                 'previous_block_hash' => $previousBlockHash
             ])
                 ->transactions()
-                ->create($params);
+                ->create([
+                    ...$params,
+                    'digital_signature' => $signature
+                ]);
         }
+
+    }
+
+    public static function verify($transaction)
+    {
+        try {
+            $publicKeyString = $transaction->file_stored_by;
+            $publicKeyFile = tempnam(sys_get_temp_dir(), 'temp_');
+            file_put_contents($publicKeyFile, $publicKeyString);
+            $publicKey = KeyFactory::loadSignaturePublicKey($publicKeyFile);
+            unlink($publicKeyFile);
+
+            $signature = $transaction->digital_signature;
+
+            return Crypto::verify(json_encode([
+                'uploaded_file_path' => $transaction->uploaded_file_path,
+                'file_uploaded_by' => $transaction->file_uploaded_by,
+                'file_stored_by' => $transaction->file_stored_by,
+                'file_hash' => $transaction->file_hash,
+            ]), $publicKey, $signature);
+
+        } catch (\Throwable $th) {
+            return false;
+        }
+
 
     }
 
