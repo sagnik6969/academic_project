@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use ParagonIE\Halite\Asymmetric\Crypto;
 use ParagonIE\Halite\KeyFactory;
@@ -67,6 +68,12 @@ class Transaction extends Model
                         $transaction->save();
                     }
                 );
+
+            $block->load('transactions');
+
+            Http::post(env("OTHER_CSP_URL", 'http://127.0.0.1:8080') . '/api/verify_block', [
+                'block' => $block
+            ]);
 
         }
 

@@ -32,14 +32,15 @@ class BlockChainController extends Controller
 
     public function addBlockToBlockChain()
     {
-        //$receivedPreviousBlockHash = request()->block->previous_block_hash;
-        //$actualPreviousBlockHash = Hash::make(Block::with('transactions')->latest()->first());
+        $receivedPreviousBlockHash = request()->block->previous_block_hash;
+        $previousBlockCount = Block::count();
+        $actualPreviousBlockHash = $previousBlockCount ? Hash::make(Block::with('transactions')->latest()->first()) : '';
 
-        // if ($receivedPreviousBlockHash != $actualPreviousBlockHash) {
-        //     return response()->json([
-        //         'message' => 'invalid previous block hash'
-        //     ], 400);
-        // }
+        if ($receivedPreviousBlockHash != $actualPreviousBlockHash) {
+            return response()->json([
+                'message' => 'invalid previous block hash'
+            ], 400);
+        }
 
         foreach (request()->block['transactions'] as $transaction) {
             if (!Transaction::verify((object) $transaction)) {
@@ -48,6 +49,24 @@ class BlockChainController extends Controller
                 ], 400);
             }
         }
+
+        $block = Block::create([
+            'id' => request()->block->id,
+            'previous_block_hash' => $receivedPreviousBlockHash
+        ]);
+
+        foreach (request()->block['transactions'] as $transaction) {
+            Transaction::create([
+                "uploaded_file_path" => $transaction->uploaded_file_path,
+                "file_uploaded_by" => $transaction->file_uploaded_by,
+                "file_stored_by" => $transaction->file_stored_by,
+                "file_hash" => $transaction->file_hash,
+                "digital_signature" => $transaction->digital_signature,
+                "block_id" => $block->id
+            ]);
+        }
+
+
 
         return response()->json([
             'message' => 'block is valid',
