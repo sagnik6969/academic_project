@@ -32,7 +32,7 @@ class BlockChainController extends Controller
 
     public function addBlockToBlockChain()
     {
-        $receivedPreviousBlockHash = request()->block->previous_block_hash;
+        $receivedPreviousBlockHash = request()->block['previous_block_hash'];
         $previousBlockCount = Block::count();
         $actualPreviousBlockHash = $previousBlockCount ? Hash::make(Block::with('transactions')->latest()->first()) : '';
 
@@ -51,17 +51,17 @@ class BlockChainController extends Controller
         }
 
         $block = Block::create([
-            'id' => request()->block->id,
-            'previous_block_hash' => $receivedPreviousBlockHash
+            'id' => request()->block['id'],
+            'previous_block_hash' => $actualPreviousBlockHash
         ]);
 
         foreach (request()->block['transactions'] as $transaction) {
             Transaction::create([
-                "uploaded_file_path" => $transaction->uploaded_file_path,
-                "file_uploaded_by" => $transaction->file_uploaded_by,
-                "file_stored_by" => $transaction->file_stored_by,
-                "file_hash" => $transaction->file_hash,
-                "digital_signature" => $transaction->digital_signature,
+                "uploaded_file_path" => $transaction['uploaded_file_path'],
+                "file_uploaded_by" => $transaction['file_uploaded_by'],
+                "file_stored_by" => $transaction['file_stored_by'],
+                "file_hash" => $transaction['file_hash'],
+                "digital_signature" => $transaction['digital_signature'],
                 "block_id" => $block->id
             ]);
         }
@@ -69,8 +69,8 @@ class BlockChainController extends Controller
 
 
         return response()->json([
-            'message' => 'block is valid',
-        ], 400);
+            'message' => 'block is added successfully to the chain',
+        ], 200);
 
     }
 
