@@ -44,7 +44,7 @@ class SetupBlockChain extends Command
                     'previous_block_hash' => $block['previous_block_hash'],
                 ]);
                 foreach ($block['transactions'] as $transaction) {
-                    if (!Transaction::verify($transaction)) {
+                    if (!Transaction::verify((object) $transaction)) {
                         throw new Exception("transaction with id {$transaction['id']} is invalid");
                     }
                 }
