@@ -28,6 +28,12 @@ class Transaction extends Model
         $publicKey = KeyFactory::loadSignaturePublicKey(base_path() . '/.block_chain_keys/public');
         $signature = Crypto::sign(json_encode($params), $privateKey);
 
+        $transaction = Transaction::create([
+            ...$params,
+            'digital_signature' => $signature
+
+        ]);
+
         //KeyFactory::importSignaturePublicKey() => to derive the key from string
         // if (Crypto::verify(json_encode($params), $publicKey, $signature)) {
         //     Log::info('Signature verified successfully');
@@ -40,40 +46,31 @@ class Transaction extends Model
         // $params['digital_signature'] = $signature;
 
 
-        $noOfTransactionsInPreviousBlock =
-            Block::latest()
-                ->first()
-                    ?->transactions()
-                ->count();
+        $numberOfTransactionsWhichAreNotAddedToBlock =
+            Transaction::whereNull('block_id')->count();
 
 
-
-        if ($noOfTransactionsInPreviousBlock && $noOfTransactionsInPreviousBlock < 2) {
-            return Block::latest()
-                ->first()
-                ->transactions()
-                ->create([
-                    ...$params,
-                    'digital_signature' => $signature
-
-                ]);
-        } else {
+        if ($numberOfTransactionsWhichAreNotAddedToBlock >= 2) {
             $block = Block::with('transactions')->latest()->first();
-
 
             $previousBlockHash = $block ? Hash::make(json_encode($block->toJson())) : '';
 
-
-            return Block::create([
+            $block = Block::create([
                 'previous_block_hash' => $previousBlockHash
-            ])
-                ->transactions()
-                ->create([
-                    ...$params,
-                    'digital_signature' => $signature
-                ]);
+            ]);
+
+            Transaction::whereNull('block_id')
+                ->get()
+                ->each(
+                    function ($transaction) use ($block) {
+                        $transaction->block_id = $block->id;
+                        $transaction->save();
+                    }
+                );
+
         }
 
+        return $transaction;
     }
 
     public static function verify($transaction)

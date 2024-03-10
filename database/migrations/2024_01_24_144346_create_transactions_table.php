@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('file_stored_by');
             $table->string('file_hash');
             $table->string('digital_signature');
-            $table->foreignIdFor(Block::class)->constrained();
+            $table->foreignIdFor(Block::class)->nullable()->constrained();
             $table->timestamps();
         });
     }

@@ -26,7 +26,7 @@ class FileController extends Controller
             'file_stored_by' => env('BLOCK_CHAIN_PUBLIC_KEY'),
             'file_hash' => $fileHash,
         ]);
-        $transaction->load('block');
+        // $transaction->load('block');
         // return redirect(url('storage/' . $path));
         return $transaction;
 
