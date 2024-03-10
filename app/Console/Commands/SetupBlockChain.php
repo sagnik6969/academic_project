@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Block;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
@@ -29,7 +30,12 @@ class SetupBlockChain extends Command
         $this->call('db:wipe');
         $this->call('migrate');
         $response = Http::get(env('OTHER_CSP_URL', 'http://127.0.0.1:8080') . '/api/full_blockchain');
-        $this->info($response->body());
+        $blocks = json_decode($response->body());
+
+        foreach ($blocks as $block) {
+            Block::create($block);
+        }
+
 
     }
 }
