@@ -23,3 +23,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::apiResource('file', FileController::class)->only(['store']);
 Route::get('full_blockchain', [BlockChainController::class, 'getFullBlockChain']);
 Route::post('verify_transaction', [BlockChainController::class, 'verifyTransaction']);
+Route::post('verify_block', [BlockChainController::class, 'addBlockToBlockChain']);

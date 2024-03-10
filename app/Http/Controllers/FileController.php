@@ -25,7 +25,6 @@ class FileController extends Controller
             'file_uploaded_by' => 'sagnik',
             'file_stored_by' => env('BLOCK_CHAIN_PUBLIC_KEY'),
             'file_hash' => $fileHash,
-
         ]);
         $transaction->load('block');
         // return redirect(url('storage/' . $path));
